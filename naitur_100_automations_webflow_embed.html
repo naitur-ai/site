@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAITUR.AI — 100 SMB AI Automations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=Fraunces:opsz,wght@9..144,300;9..144,500&display=swap');
+
+/* ============================================
+   NAITUR.AI DESIGN SYSTEM TOKENS
+   Extracted from naitur.ai Webflow site
+   ============================================ */
+:root {
+  /* Core palette — dark theme matching naitur.ai */
+  --n-bg-page: #0a0a0a;
+  --n-bg-surface: #141414;
+  --n-bg-card: #1a1a1a;
+  --n-bg-card-hover: #222222;
+  --n-bg-elevated: #252525;
+
+  /* Text hierarchy */
+  --n-text-primary: #f0f0ec;
+  --n-text-secondary: #a8a8a0;
+  --n-text-tertiary: #6b6b64;
+  --n-text-muted: #4a4a44;
+
+  /* Brand accent (green from site) */
+  --n-accent: #1D9E75;
+  --n-accent-soft: rgba(29, 158, 117, 0.12);
+  --n-accent-text: #3ddba0;
+
+  /* Borders */
+  --n-border: rgba(255,255,255,0.06);
+  --n-border-hover: rgba(255,255,255,0.12);
+  --n-border-active: rgba(255,255,255,0.18);
+
+  /* Radius — matches Webflow card rounding */
+  --n-radius-sm: 8px;
+  --n-radius-md: 12px;
+  --n-radius-lg: 16px;
+  --n-radius-xl: 20px;
+
+  /* Category colors — tuned for dark backgrounds */
+  --c-revenue: #E8714A;
+  --c-customer: #3ddba0;
+  --c-operations: #5ea3f0;
+  --c-productivity: #8b7ef0;
+  --c-finance: #8bbf44;
+  --c-hr: #e87098;
+  --c-legal: #dba24a;
+  --c-it: #8a8a82;
+  --c-success: #3ddba0;
+  --c-product: #8b7ef0;
+  --c-ecommerce: #E8714A;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  color: var(--n-text-primary);
+  background: var(--n-bg-page);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Container matches Webflow's max-width pattern */
+.widget-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+/* ---- HERO ---- */
+.hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.hero h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(24px, 4vw, 36px);
+  letter-spacing: -0.025em;
+  color: var(--n-text-primary);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+.hero h2 em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--n-accent-text);
+}
+.hero .subtitle {
+  font-size: 15px;
+  color: var(--n-text-secondary);
+  margin-bottom: 1rem;
+}
+.hero .badge {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--n-accent-soft);
+  color: var(--n-accent-text);
+  border: 1px solid rgba(29,158,117,0.2);
+}
+
+/* ---- CATEGORY GRID ---- */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+.cat-card {
+  position: relative;
+  background: var(--n-bg-card);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-md);
+  padding: 16px 18px 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.cat-card:hover {
+  background: var(--n-bg-card-hover);
+  border-color: var(--n-border-hover);
+  transform: translateY(-2px);
+}
+.cat-card.active {
+  border-width: 1.5px;
+}
+.cat-card .icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--n-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.cat-card .cat-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--n-text-primary);
+  line-height: 1.3;
+}
+.cat-card .cat-count {
+  font-size: 11px;
+  color: var(--n-text-tertiary);
+  margin-top: 3px;
+}
+.cat-card .progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2.5px;
+  border-radius: 0 0 0 var(--n-radius-md);
+  transition: width 0.4s ease;
+}
+
+/* ---- DETAIL PANEL ---- */
+.detail-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.45s ease, opacity 0.35s ease;
+}
+.detail-panel.open {
+  max-height: 3000px;
+  opacity: 1;
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 10px;
+  border-bottom: 1px solid var(--n-border);
+  margin-bottom: 12px;
+}
+.detail-header .dh-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.detail-header .dh-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+.detail-header .dh-count {
+  font-size: 12px;
+  color: var(--n-text-tertiary);
+  margin-left: auto;
+}
+.close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--n-border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--n-text-secondary);
+  margin-left: 8px;
+  transition: all 0.15s;
+}
+.close-btn:hover {
+  background: var(--n-bg-elevated);
+  border-color: var(--n-border-hover);
+}
+
+/* ---- AUTOMATION LIST ---- */
+.auto-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 4px;
+  margin-bottom: 1.5rem;
+}
+.auto-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--n-radius-sm);
+  transition: background 0.15s;
+}
+.auto-item:hover {
+  background: var(--n-bg-elevated);
+}
+.auto-item .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+.auto-item .name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--n-text-primary);
+  line-height: 1.35;
+}
+.auto-item .desc {
+  font-size: 12px;
+  color: var(--n-text-tertiary);
+  margin-top: 1px;
+  line-height: 1.35;
+}
+
+/* ---- CTA FOOTER ---- */
+.widget-cta {
+  text-align: center;
+  padding: 2rem 0 0.5rem;
+  border-top: 1px solid var(--n-border);
+  margin-top: 1rem;
+}
+.widget-cta .cta-text {
+  font-size: 13px;
+  color: var(--n-text-secondary);
+  margin-bottom: 14px;
+}
+.cta-button {
+  display: inline-block;
+  padding: 12px 36px;
+  border-radius: 28px;
+  border: none;
+  background: var(--n-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.cta-button:hover {
+  background: #1aad7e;
+  transform: translateY(-1px);
+}
+
+/* ---- FOOTER BRANDING ---- */
+.widget-footer {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+  font-size: 11px;
+  color: var(--n-text-muted);
+}
+.widget-footer span {
+  color: var(--n-accent-text);
+  font-weight: 500;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 640px) {
+  .widget-container { padding: 2rem 1rem; }
+  .cat-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .auto-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 400px) {
+  .cat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="hero">
+    <h2>The <em>100</em> AI automations<br>every small business needs</h2>
+    <div class="subtitle">Agentic AI solutions mapped across your entire operation</div>
+    <div class="badge">Explore the opportunity map</div>
+  </div>
+
+  <div class="cat-grid" id="grid"></div>
+
+  <div class="detail-panel" id="detailPanel">
+    <div id="detailInner"></div>
+  </div>
+
+  <div class="widget-cta">
+    <div class="cta-text">See something that could transform your operations?</div>
+    <a href="https://naitur.ai/contact" class="cta-button">Get your free automation audit</a>
+  </div>
+
+  <div class="widget-footer">Powered by <span>NAITUR.AI</span> — intelligent automation for growing businesses</div>
+</div>
+
+<script>
+const data = [
+  {id:"revenue",name:"Revenue growth",color:"var(--c-revenue)",colorHex:"#E8714A",bgAlpha:"rgba(232,113,74,0.08)",bgStronger:"rgba(232,113,74,0.15)",items:[
+    {t:"Auto-qualify inbound leads",d:"Based on email, form, or call content"},
+    {t:"Personalize cold outreach at scale",d:"Using LinkedIn and website intel"},
+    {t:"Behavior-reactive follow-up sequences",d:"Triggered by clicks, opens, no response"},
+    {t:"Turn sales calls into proposals",d:"Auto-generate decks, quotes, next steps"},
+    {t:"Create ad copy + landing pages",d:"Based on product type and target audience"},
+    {t:"Extract and summarize online reviews",d:"Generate testimonials or ad copy"},
+    {t:"Generate referral outreach campaigns",d:"Triggered by satisfied customer actions"},
+    {t:"Automate upsell offers",d:"Based on customer lifecycle stage"},
+    {t:"Run win/loss analysis",d:"On sales calls using AI transcription"},
+    {t:"Build pricing suggestions",d:"Based on competitor and customer data"}
+  ]},
+  {id:"customer",name:"Customer intelligence",color:"var(--c-customer)",colorHex:"#3ddba0",bgAlpha:"rgba(61,219,160,0.08)",bgStronger:"rgba(61,219,160,0.15)",items:[
+    {t:"AI chatbots trained on your docs",d:"Available 24/7, matching your tone"},
+    {t:"Auto-tag support tickets",d:"Route to the right person or system"},
+    {t:"Summarize customer calls or chats",d:"Update CRM + generate follow-ups"},
+    {t:"Detect churn risk",d:"From language/tone in emails and reviews"},
+    {t:"Suggest upsells or offers",d:"Based on past purchase and behavior"},
+    {t:"Generate satisfaction surveys",d:"Triggered after support resolution"},
+    {t:"Analyze support trends",d:"Identify common product pain points"},
+    {t:"Create help desk macros",d:"Based on AI-clustered support queries"},
+    {t:"Automate NPS scoring",d:"With real-time sentiment analysis"},
+    {t:"Draft follow-up emails",d:"Based on resolved tickets and tone"},
+    {t:"Auto-build knowledge base articles",d:"From closed tickets and chats"},
+    {t:"Generate customer health scores",d:"From usage and engagement metrics"},
+    {t:"Summarize product feedback",d:"Collected across platforms into themes"}
+  ]},
+  {id:"operations",name:"Operations & admin",color:"var(--c-operations)",colorHex:"#5ea3f0",bgAlpha:"rgba(94,163,240,0.08)",bgStronger:"rgba(94,163,240,0.15)",items:[
+    {t:"Sync customer data across tools",d:"Stripe, Notion, Airtable, QuickBooks"},
+    {t:"Generate weekly dashboards",d:"From scattered data sources"},
+    {t:"Automate document creation",d:"Contracts, SOWs, invoices from forms"},
+    {t:"Monitor metrics + auto-alert anomalies",d:"Traffic drops, cart abandonment"},
+    {t:"Scrape data from emails/spreadsheets",d:"Into usable databases"},
+    {t:"Auto-categorize receipts",d:"Into bookkeeping software"},
+    {t:"Run recurring financial summaries",d:"Cash flow and P&L tracking"},
+    {t:"Send renewal reminders",d:"Based on contract end dates"},
+    {t:"Update inventory records",d:"Using scanned POs or receipts"},
+    {t:"Convert paper forms",d:"Into structured, cloud-based entries"},
+    {t:"Log meeting notes into CRM",d:"After calls with clients or partners"},
+    {t:"Generate procurement requests",d:"Based on inventory thresholds"},
+    {t:"Auto-assign service tickets",d:"Based on issue type and availability"}
+  ]},
+  {id:"productivity",name:"Productivity & workflow",color:"var(--c-productivity)",colorHex:"#8b7ef0",bgAlpha:"rgba(139,126,240,0.08)",bgStronger:"rgba(139,126,240,0.15)",items:[
+    {t:"Summarize meetings with action items",d:"And send follow-ups automatically"},
+    {t:"Auto-assign and prioritize tasks",d:"Based on project status or deadlines"},
+    {t:"Draft standard internal messages",d:"Project updates, client status emails"},
+    {t:"Schedule social media posts",d:"Generated from blog or product updates"},
+    {t:"Create SOPs from recorded videos",d:"Loom to how-to documentation"},
+    {t:"Build team check-in dashboards",d:"Key project statuses auto-filled"},
+    {t:"Notify teams of bottlenecks",d:"Based on workflow progress data"},
+    {t:"Create visual project timelines",d:"Automatically from task updates"},
+    {t:"Generate internal progress reports",d:"Summarized weekly by team"},
+    {t:"Analyze team performance",d:"Completed task volume + quality"},
+    {t:"Auto-generate retrospectives",d:"From project comments and chat logs"},
+    {t:"Detect duplicate workstreams",d:"By analyzing task and project overlaps"},
+    {t:"Draft onboarding guides",d:"Based on tools and team workflows"}
+  ]},
+  {id:"finance",name:"Finance & accounting",color:"var(--c-finance)",colorHex:"#8bbf44",bgAlpha:"rgba(139,191,68,0.08)",bgStronger:"rgba(139,191,68,0.15)",items:[
+    {t:"Reconcile transactions",d:"Across bank, Stripe, and invoice records"},
+    {t:"Generate monthly financial reports",d:"Automatically from QuickBooks"},
+    {t:"Flag unusual spend",d:"And generate approval workflows"},
+    {t:"Auto-issue late payment reminders",d:"Based on invoice status"},
+    {t:"Create custom budget dashboards",d:"From real-time accounting data"},
+    {t:"Classify expenses",d:"Using OCR and historical patterns"},
+    {t:"Generate tax prep reports",d:"With categorized entries and summaries"},
+    {t:"Track reimbursements",d:"And auto-notify finance team"},
+    {t:"Monitor profit margins",d:"By SKU or customer type"},
+    {t:"Sync payroll data",d:"From HR platforms to bookkeeping"},
+    {t:"Forecast cash flow trends",d:"Using historical revenue and expenses"},
+    {t:"Validate vendor invoices",d:"Cross-checking against agreed terms"},
+    {t:"Create expense forecasts",d:"Based on seasonality and activity"}
+  ]},
+  {id:"hr",name:"HR & people ops",color:"var(--c-hr)",colorHex:"#e87098",bgAlpha:"rgba(232,112,152,0.08)",bgStronger:"rgba(232,112,152,0.15)",items:[
+    {t:"Screen resumes automatically",d:"Based on role criteria and tone"},
+    {t:"Draft interview summaries",d:"From recorded calls or notes"},
+    {t:"Onboard employees via automation",d:"Email sequences and checklists"},
+    {t:"Schedule training sessions",d:"Based on role and start date"},
+    {t:"Generate feedback surveys",d:"After 30/60/90 days"},
+    {t:"Identify burnout risk",d:"Based on email activity and sentiment"},
+    {t:"Send performance review reminders",d:"To managers and reports"},
+    {t:"Create pulse surveys",d:"And summarize team mood weekly"},
+    {t:"Draft job descriptions",d:"From hiring manager inputs"},
+    {t:"Monitor hiring funnel health",d:"With predictive analytics"},
+    {t:"Draft internal policy updates",d:"Based on regulation changes"},
+    {t:"Analyze turnover risk",d:"By department and tenure"},
+    {t:"Automate employee offboarding",d:"Account deactivation and surveys"}
+  ]},
+  {id:"legal",name:"Legal & compliance",color:"var(--c-legal)",colorHex:"#dba24a",bgAlpha:"rgba(219,162,74,0.08)",bgStronger:"rgba(219,162,74,0.15)",items:[
+    {t:"Track contract milestones",d:"And send renewal alerts"},
+    {t:"Generate NDAs or MSAs",d:"Based on client and deal type"},
+    {t:"Auto-tag legal documents",d:"By clause type and topic"},
+    {t:"Summarize legal documents",d:"Into bullet point briefs"},
+    {t:"Monitor regulatory updates",d:"Relevant to your industry"},
+    {t:"Scan vendor contracts for risk",d:"Risk language and exceptions"},
+    {t:"Create compliance checklists",d:"Based on geography or department"},
+    {t:"Log GDPR/HIPAA activities",d:"Automatically from workflows"},
+    {t:"Redact PII from documents",d:"Before external sharing"},
+    {t:"Generate internal audit reports",d:"From process and tool logs"},
+    {t:"Summarize key contract risks",d:"Before review by legal counsel"},
+    {t:"Auto-generate privacy policies",d:"Based on company type and geography"},
+    {t:"Monitor document access logs",d:"For compliance with internal policies"}
+  ]},
+  {id:"it",name:"IT & security",color:"var(--c-it)",colorHex:"#8a8a82",bgAlpha:"rgba(138,138,130,0.08)",bgStronger:"rgba(138,138,130,0.15)",items:[
+    {t:"Auto-expire user credentials",d:"Based on role or inactivity period"},
+    {t:"Flag unusual network activity",d:"And generate incident reports"},
+    {t:"Generate backup verification logs",d:"Confirm data recovery readiness"}
+  ]},
+  {id:"success",name:"Customer success",color:"var(--c-success)",colorHex:"#3ddba0",bgAlpha:"rgba(61,219,160,0.08)",bgStronger:"rgba(61,219,160,0.15)",items:[
+    {t:"Trigger proactive check-ins",d:"Based on engagement dips"},
+    {t:"Auto-generate onboarding journeys",d:"Tailored to customer segments"},
+    {t:"Summarize client QBRs",d:"With metrics and recommendations"}
+  ]},
+  {id:"product",name:"R&D / product",color:"var(--c-product)",colorHex:"#8b7ef0",bgAlpha:"rgba(139,126,240,0.08)",bgStronger:"rgba(139,126,240,0.15)",items:[
+    {t:"Cluster feature requests",d:"From tickets and user forums"},
+    {t:"Summarize user interviews",d:"Into themes and quotes"},
+    {t:"Predict product usage trends",d:"Using time-series modeling"}
+  ]},
+  {id:"ecommerce",name:"Ecommerce",color:"var(--c-ecommerce)",colorHex:"#E8714A",bgAlpha:"rgba(232,113,74,0.08)",bgStronger:"rgba(232,113,74,0.15)",items:[
+    {t:"Abandoned cart email flows",d:"Customized to product and visitor type"},
+    {t:"Auto-generate SKU descriptions",d:"Based on product photos and tags"},
+    {t:"Forecast stockouts",d:"Based on sales velocity and delivery lags"}
+  ]}
+];
+
+const icons = ["↗","♦","⚙","▸","$","♟","§","⛨","✦","◈","◉"];
+const grid = document.getElementById('grid');
+const panel = document.getElementById('detailPanel');
+const inner = document.getElementById('detailInner');
+let activeIdx = -1;
+
+data.forEach((cat, i) => {
+  const card = document.createElement('div');
+  card.className = 'cat-card';
+  const pct = (cat.items.length / 13 * 100);
+  card.innerHTML = `
+    <div class="icon-badge" style="background:${cat.bgAlpha};color:${cat.colorHex}">${icons[i]}</div>
+    <div class="cat-name">${cat.name}</div>
+    <div class="cat-count">${cat.items.length} automation${cat.items.length > 1 ? 's' : ''}</div>
+    <div class="progress-bar" style="background:${cat.colorHex};width:${pct}%"></div>
+  `;
+  card.addEventListener('click', () => toggle(i));
+  grid.appendChild(card);
+});
+
+function toggle(idx) {
+  if (activeIdx === idx) {
+    panel.classList.remove('open');
+    document.querySelectorAll('.cat-card').forEach(c => { c.classList.remove('active'); c.style.borderColor = ''; });
+    activeIdx = -1;
+    return;
+  }
+  activeIdx = idx;
+  const cat = data[idx];
+  document.querySelectorAll('.cat-card').forEach((c, ci) => {
+    c.classList.toggle('active', ci === idx);
+    c.style.borderColor = ci === idx ? cat.colorHex : '';
+  });
+
+  inner.innerHTML = `
+    <div class="detail-header">
+      <div class="dh-icon" style="background:${cat.bgAlpha};color:${cat.colorHex}">${icons[idx]}</div>
+      <div class="dh-title" style="color:${cat.colorHex}">${cat.name}</div>
+      <div class="dh-count">${cat.items.length} automations</div>
+      <button class="close-btn" onclick="toggle(${idx})">✕</button>
+    </div>
+    <div class="auto-list">
+      ${cat.items.map(item => `
+        <div class="auto-item">
+          <div class="dot" style="background:${cat.colorHex}"></div>
+          <div>
+            <div class="name">${item.t}</div>
+            <div class="desc">${item.d}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  panel.classList.add('open');
+  setTimeout(() => panel.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+}
+</script>
+</body>
+</html>
