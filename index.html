@@ -520,6 +520,15 @@ function toggle(idx) {
   panel.classList.add('open');
   setTimeout(() => panel.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
 }
+
+   // Post height to parent for iframe auto-resize
+   const ro = new ResizeObserver(() => {
+        parent.postMessage({
+               type: 'resize',
+               height: document.body.scrollHeight
+        }, '*');
+   });
+   ro.observe(document.body);
 </script>
 </body>
 </html>
